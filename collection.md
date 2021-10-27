@@ -25,5 +25,31 @@ LinkedList 底层基于 链表，查找元素时间复杂度为O(N) 插入，添
 	底层使用 Lock 保证安全(1.8 ConcurrentHashMap 不使用 Lock 锁)
 ```
 
+## HashMap和Hashtable的区别
+
+```
+Hashtable 线程同步,HashMap 非线程同步
+Hashtable 不允许<key,value>有空值,HashMap 允许 <key,value>有空值
+Hashtable 使用 Enumeration,HashMap 使用 Iterator
+Hashtable 的 hash 数组的默认大小是11 增加方式是 old*2+1 HashMap中的数组的默认大小是16,增长是2的指数
+Hashtable 继承 Dictionary类, HashMap 继承自 AbstractMap
+```
+
+## HashMap有哪些线程安全的方式
+
+```
+1 通过 Collections.synchronizedMap() 返回一个新的 Map
+  新的Map就是线程安全的，返回的并不是 HashMap,而是 Map 接口的一个实现
+
+2 使用 java.util.concurrent.ConcurrentHashMap
+```
+
+## HashMap扩容
+
+```
+HashMap(jdk1.8以后)借助2倍扩容机制，元素不需要进行重新计算位置
+元素要们在原来的位置,要么在原来位置再移动2次幂的位置
+```
+
 
 
