@@ -282,5 +282,29 @@ Perm Gen:
 	默认大小为物理内存的1/64。
 ```
 
+## AlwaysPreTouch
+
+```
+-XX:+AlwaysPreTouch
+启动时的时候,把所有内存预先分配
+```
+
+## jvisualvm 获取JVM性能数据
+
+```
+# 远程配置
+java -Xdebug -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=false  -Dcom.sun.management.jmxremote.port=10000 -Djava.rmi.server.hostname=192.169.100.159
+```
+
+## JMC 获取 Java应用详细性能数据
+
+```
+jcmd <pid> JFR.start
+jcmd <pid> JFR.dump filename=log.jfr
+jcmd <pid> JFR.stop
+
+https://www.oracle.com/java/technologies/jdk-mission-control.html
+```
+
 
 

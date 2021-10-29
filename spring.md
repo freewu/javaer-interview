@@ -118,5 +118,121 @@ SpringMVC执行流程:
 ## Spring的事务传播机制
 
 ```
+Spring的事务传播机制有7种，在枚举Propagation中有定义
+
+# REQUIRED
+	PROPAGATION_REQUIRED：如果当前没有事务，就创建一个新事务，如果当前存在事务，就加入该事务，该设置是最常用的默认设置。
+
+    @Transactional(propagation= Propagation.REQUIRED)
+    public void methodA(){
+        methodB();
+        // do something
+    }
+
+    @Transactional(propagation= Propagation.REQUIRED)
+    public void methodB(){
+        // do something
+    }
+    调用methdoA，如果methodB发生异常，触发事务回滚，也会methodA中的也会回滚。
+
+# SUPPORTS
+	PROPAGATION_SUPPORTS：支持当前事务，如果当前存在事务，就加入该事务，如果当前不存在事务，就以非事务执行。
+	
+	@Transactional(propagation= Propagation.REQUIRED)
+    public void methodA(){
+        methodB();
+        // do something
+    }
+
+    @Transactional(propagation= Propagation.SUPPORTS)
+    public void methodB(){
+        // do something
+    }
+	如果调用methodA，再调用methodB，MehtodB会加入到MethodA的开启的当前事务中。
+	如果直接调用methodB，当前没有事务，就以非事务执行。
+	
+# MANDATORY
+	PROPAGATION_MANDATORY：支持当前事务，如果当前存在事务，就加入该事务，如果当前不存在事务，就抛出异常。
+	@Transactional(propagation= Propagation.REQUIRED)
+    public void methodA(){
+        methodB();
+        // do something
+    }
+
+    @Transactional(propagation= Propagation.MANDATORY)
+    public void methodB(){
+        // do something
+    }
+    如果调用methodA，再调用methodB，MehtodB会加入到MethodA的开启的当前事务中。
+	如果直接调用methodB，当前没有事务，就会抛出异常。
+	
+# REQUIRES_NEW
+	PROPAGATION_REQUIRES_NEW：创建新事务，无论当前存不存在事务，都创建新事务
+	@Transactional(propagation= Propagation.REQUIRED)
+    public void methodA(){
+        // do something pre
+        methodB();
+        // do something post
+    }
+
+    @Transactional(propagation= Propagation.REQUIRES_NEW)
+    public void methodB(){
+        // do something
+    }
+    调用methodA，会先开启事务1，执行A的something pre的代码。
+    再调用methodB，methdoB会开启一个事务2，再执行自身的代码。
+    最后在执行methodA的something post。
+    如果method发生异常回滚，只是methodB中的代码回滚，不影响methodA中的代码。
+    如果methodA发生异常回滚，只回滚methodA中的代码，不影响methodB中的代码。
+	简言之，不会影响别人，也不会被别人影响。
+
+# NOT_SUPPORTED
+	PROPAGATION_NOT_SUPPORTED：以非事务方式执行操作，如果当前存在事务，就把当前事务挂起。
+	@Transactional(propagation= Propagation.REQUIRED)
+    public void methodA(){
+        methodB();
+        // do something
+    }
+
+    @Transactional(propagation= Propagation.NOT_SUPPORTED)
+    public void methodB(){
+        // do something
+    }
+	调用methodA，再调用methodB，methodA开启的事务会被挂起，即在methodB中不齐作用，相当于没有事务，	 methodB内部抛出异常不会回滚。methodA内的代码发生异常会回滚。
+	直接调用methodB，不会开启事务。
+
+# NEVER
+	PROPAGATION_NEVER：以非事务方式执行操作，如果当前存在事务，则抛出异常。
+	@Transactional(propagation= Propagation.REQUIRED)
+    public void methodA(){
+        methodB();
+        // do something
+    }
+
+    @Transactional(propagation= Propagation.NEVER)
+    public void methodB(){
+        // do something
+    }
+
+# NESTED
+	PROPAGATION_NESTED：如果当前存在事务，则在嵌套事务内执行。如果当前没有事务，则按REQUIRED属性执行。
+	@Transactional(propagation= Propagation.REQUIRED)
+    public void methodA(){
+        // do something pre
+        methodB();
+        // do something post
+    }
+
+    @Transactional(propagation= Propagation.NESTED)
+    public void methodB(){
+        // do something
+    }
+	调用methodA，开启一个事务，执行something pre的代码，
+	设置回滚点savepoint,再调用methodB的代码，
+	如果methodB里抛出异常，此时回滚到之前的saveponint。
+	再然后执行methodA里的something post的代码，最后提交或者回滚事务。
+	嵌套事务，外层的事务如果回滚，会导致内层的事务也回滚；
+	但是内层的事务如果回滚，仅仅是回滚自己的代码，不影响外层的事务的代码。
+
 ```
 
